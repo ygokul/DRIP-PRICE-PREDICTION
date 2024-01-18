@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Analyzer - Result</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    
+    <!-- Add Favicon -->
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/png">
+
+    <style>
+        body {
+            background-color: #f8f9fa; /* Light gray background color */
+        }
+    
+        .container {
+            background-color: #ffffff; /* White container background color */
+            padding: 20px; /* Add padding to the container */
+            border-radius: 8px; /* Add border radius to the container */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add a subtle box shadow */
+        }
+    
+        h1 {
+            color: #007bff; /* Blue heading color */
+        }
+    
+        img {
+            max-width: 100%; /* Make sure the image doesn't exceed its container */
+            height: auto; /* Maintain the aspect ratio of the image */
+            margin-bottom: 20px; /* Add spacing below the image */
+        }
+    
+        .card {
+            margin-top: 20px; /* Add spacing above the card */
+        }
+    
+        .list-group-item {
+            background-color: #f8f9fa; /* Light gray background color for list items */
+            border: none; /* Remove border */
+        }
+    
+        .text-danger {
+            color: #dc3545; /* Red text color for danger messages */
+        }
+    
+        .text-success {
+            color: #28a745; /* Green text color for success messages */
+        }
+    </style>
+</head>
+<body>
+    
+
+    <div class="container mt-5">
+        <a href="/" class="btn btn-primary">Back</a>
+        <h1 class="mb-4">Product Analysis Result</h1>
+         <img src="{{ img_src }}" alt="Product Image">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Product Information</h5>
+                <p class="card-text"><strong>Price:</strong> ₹{{ prod_price }}</p>
+                <p class="card-text"><strong>Features:</strong> {{ prod_features }}</p>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <h5>Search Results</h5>
+            <ul class="list-group">
+                {% for result in search_results %}
+                    <li class="list-group-item"><a href="{{ result }}" target="_blank">{{ result }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="mt-4">
+            <h5>Drip Pricing Detection</h5>
+            {% if drip_pricing_detected %}
+                <p class="text-danger">Potential drip pricing detected!</p>
+            {% else %}
+                <p class="text-success">No potential drip pricing detected.</p>
+            {% endif %}
+        </div>
+
+        <div class="mt-4">
+            <h5>Actual Drip Pricing</h5>
+            {% if actual_drip_pricing_detected %}
+                <p class="text-danger">Actual drip pricing detected based on script attribute! Predicted price after drip pricing: ₹{{ predicted_price }}</p>
+            {% else %}
+                <p class="text-success">No actual drip pricing detected based on script attribute. </p>
+            {% endif %}
+        </div>
+
+        <div class="mt-4">
+            <a href="/" class="btn btn-primary">Back</a>
+
+        </div>
+    </div>
+</body>
+</html>

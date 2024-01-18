@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deodap Product Analyzer</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/png">
+
+
+
+
+    <style>
+        body {
+            background-color: #f8f9fa; /* Light gray background color */
+        }
+
+        .container {
+            background-color: #ffffff; /* White container background color */
+            padding: 20px; /* Add padding to the container */
+            border-radius: 8px; /* Add border radius to the container */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add a subtle box shadow */
+            text-align: center; /* Center-align the content */
+        }
+
+        h1 {
+            color: #007bff; /* Blue heading color */
+        }
+
+        form {
+            max-width: 400px; /* Limit the width of the form */
+            margin: auto; /* Center-align the form */
+        }
+
+        label {
+            font-weight: bold; /* Bold labels */
+            color: #495057; /* Dark gray label color */
+        }
+
+        .form-control {
+            margin-bottom: 15px; /* Add spacing between input and button */
+        }
+
+        button {
+            width: 100%; /* Make the button full-width */
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">Deodap Product Analyzer</h1>
+        <form method="post">
+            <div class="form-group">
+                <label for="url">Enter Product URL:</label>
+                <input type="text" class="form-control" id="url" name="url" placeholder="https://example.com/product" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Analyze</button>
+        </form>
+    </div>
+</body>
+</html>

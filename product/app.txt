@@ -1,0 +1,87 @@
+from flask import Flask, render_template, request
+from bs4 import BeautifulSoup
+import requests
+import nltk
+import spacy
+from googlesearch import search
+from itertools import islice
+import time
+
+app = Flask(__name__)
+
+nlp = spacy.load("en_core_web_sm")
+
+def extract_keywords(text, num_keywords=25):
+    words = nltk.word_tokenize(text)
+    stop_words = set(nltk.corpus.stopwords.words('english'))
+    filtered_words = [word.lower() for word in words if word.isalnum() and word.lower() not in stop_words]
+    return filtered_words[:num_keywords]
+
+def search_product(keywords, num_results=5):
+    query = ' '.join(keywords)
+    
+    # Introduce a delay of 2 seconds between each request
+    time.sleep(2)
+    
+    try:
+        search_results = list(islice(search(query), num_results))
+        return search_results
+    except Exception as e:
+        print(f"Error during search: {e}")
+        return []
+
+def check_drip_pricing(prod_features):
+    doc = nlp(prod_features)
+    payment_keywords = ["prepaid", "cash on delivery", "cod"]
+    fee_keywords = ["fee", "charge", "shipping"]
+
+    for sent in doc.sents:
+        if any(keyword in sent.text.lower() for keyword in payment_keywords):
+            if any(fee_keyword in sent.text.lower() for fee_keyword in fee_keywords):
+                return True
+
+    return False
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    if request.method == 'POST':
+        url = request.form['url']
+        HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Edg/120.0.0.0',
+                   'Accept-Language': 'en-US,en;q=0.5', 'Content-Type': 'application/json', 'tz': 'GMT+00:00'}
+
+        try:
+            webpage = requests.get(url, headers=HEADERS)
+            webpage.raise_for_status()  # Raise an exception for HTTP errors
+
+            soup = BeautifulSoup(webpage.content, 'html.parser')
+
+            # Extract product price
+            prod_price_element = soup.find("div", class_="price__current price__current--on-sale").find("span", class_="money")
+            prod_price = prod_price_element.text.strip() if prod_price_element else "N/A"
+
+            # Extract product features
+            prod_features_element = soup.find("div", class_="product-description rte")
+            prod_features = prod_features_element.text.strip() if prod_features_element else "N/A"
+
+            nltk.download('punkt')
+            nltk.download('stopwords')
+
+            keywords = extract_keywords(prod_features, num_keywords=25)
+
+            search_results = search_product(keywords, num_results=5)
+
+            drip_pricing_detected = check_drip_pricing(prod_features)
+
+            return render_template('result.html', url=url, prod_price=prod_price, prod_features=prod_features,
+                                    search_results=search_results, drip_pricing_detected=drip_pricing_detected)
+
+        except requests.exceptions.HTTPError as http_err:
+            return f"HTTP error occurred: {http_err}"
+
+        except Exception as e:
+            return f"An error occurred: {e}"
+
+    return render_template('index.html')
+
+if __name__ == '__main__':
+    app.run(debug=True)
